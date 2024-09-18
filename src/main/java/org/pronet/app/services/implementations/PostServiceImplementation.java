@@ -24,15 +24,15 @@ public class PostServiceImplementation implements PostService {
         User foundedUser = userRepository
                 .findById(request.getUserId())
                 .orElse(null);
-        if (foundedUser == null) {
-            return null;
+        if (foundedUser != null) {
+            Post post = new Post();
+            post.setId(request.getId());
+            post.setTitle(request.getTitle());
+            post.setText(request.getText());
+            post.setUser(foundedUser);
+            return postRepository.save(post);
         }
-        Post post = new Post();
-        post.setId(request.getId());
-        post.setTitle(request.getTitle());
-        post.setText(request.getText());
-        post.setUser(foundedUser);
-        return postRepository.save(post);
+        return null;
     }
 
     @Override
