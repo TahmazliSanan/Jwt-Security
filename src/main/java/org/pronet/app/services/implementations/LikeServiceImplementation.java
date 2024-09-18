@@ -8,11 +8,13 @@ import org.pronet.app.repositories.LikeRepository;
 import org.pronet.app.repositories.PostRepository;
 import org.pronet.app.repositories.UserRepository;
 import org.pronet.app.requests.like.LikeCreateRequest;
+import org.pronet.app.responses.LikeResponse;
 import org.pronet.app.services.LikeService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -40,26 +42,33 @@ public class LikeServiceImplementation implements LikeService {
     }
 
     @Override
-    public List<Like> getLikeList(Optional<Long> userId, Optional<Long> postId) {
+    public List<LikeResponse> getLikeList(Optional<Long> userId, Optional<Long> postId) {
+        List<Like> likeList;
         if (userId.isPresent() && postId.isPresent()) {
-            return likeRepository.findAllByUserIdAndPostId(userId.get(), postId.get());
+            likeList = likeRepository.findAllByUserIdAndPostId(userId.get(), postId.get());
         } else if (userId.isPresent()) {
-            return likeRepository.findAllByUserId(userId.get());
+            likeList = likeRepository.findAllByUserId(userId.get());
         } else if (postId.isPresent()) {
-            return likeRepository.findAllByPostId(postId.get());
+            likeList = likeRepository.findAllByPostId(postId.get());
+        } else {
+            likeList = likeRepository.findAll();
         }
-        return likeRepository.findAll();
+        return likeList.stream().map(LikeResponse::new).collect(Collectors.toList());
     }
 
     @Override
-    public Like getLikeById(Long LikeId) {
-        return likeRepository
-                .findById(LikeId)
+    public LikeResponse getLikeById(Long likeId) {
+        Like like = likeRepository
+                .findById(likeId)
                 .orElse(null);
+        if (like != null) {
+            return new LikeResponse(like);
+        }
+        return null;
     }
 
     @Override
-    public void deleteLike(Long LikeId) {
-        likeRepository.deleteById(LikeId);
+    public void deleteLike(Long likeId) {
+        likeRepository.deleteById(likeId);
     }
 }

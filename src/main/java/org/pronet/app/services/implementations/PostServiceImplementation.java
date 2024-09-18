@@ -7,17 +7,22 @@ import org.pronet.app.repositories.PostRepository;
 import org.pronet.app.repositories.UserRepository;
 import org.pronet.app.requests.post.PostCreateRequest;
 import org.pronet.app.requests.post.PostUpdateRequest;
+import org.pronet.app.responses.LikeResponse;
+import org.pronet.app.responses.PostResponse;
+import org.pronet.app.services.LikeService;
 import org.pronet.app.services.PostService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PostServiceImplementation implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final LikeService likeService;
 
     @Override
     public Post createPost(PostCreateRequest request) {
@@ -36,18 +41,29 @@ public class PostServiceImplementation implements PostService {
     }
 
     @Override
-    public List<Post> getPostList(Optional<Long> userId) {
+    public List<PostResponse> getPostList(Optional<Long> userId) {
+        List<Post> postList;
         if (userId.isPresent()) {
-            return postRepository.findAllByUserId(userId.get());
+            postList = postRepository.findAllByUserId(userId.get());
+        } else {
+            postList = postRepository.findAll();
         }
-        return postRepository.findAll();
+        return postList.stream().map(p -> {
+            List<LikeResponse> likeList = likeService.getLikeList(Optional.empty(), Optional.of(p.getId()));
+            return new PostResponse(p, likeList);
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public Post getPostById(Long postId) {
-        return postRepository
+    public PostResponse getPostById(Long postId) {
+        Post post = postRepository
                 .findById(postId)
                 .orElse(null);
+        List<LikeResponse> likeList = likeService.getLikeList(Optional.empty(), Optional.of(postId));
+        if (post != null) {
+            return new PostResponse(post, likeList);
+        }
+        return null;
     }
 
     @Override

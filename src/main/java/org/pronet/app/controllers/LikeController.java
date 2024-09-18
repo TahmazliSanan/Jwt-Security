@@ -3,6 +3,7 @@ package org.pronet.app.controllers;
 import lombok.RequiredArgsConstructor;
 import org.pronet.app.entities.Like;
 import org.pronet.app.requests.like.LikeCreateRequest;
+import org.pronet.app.responses.LikeResponse;
 import org.pronet.app.services.LikeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +22,14 @@ public class LikeController {
     }
 
     @GetMapping(value = "/list")
-    public List<Like> getLikeList(
+    public List<LikeResponse> getLikeList(
             @RequestParam Optional<Long> userId,
             @RequestParam Optional<Long> postId) {
         return likeService.getLikeList(userId, postId);
     }
 
     @GetMapping(value = "/details/{likeId}")
-    public Like getLikeById(@PathVariable(value = "likeId") Long likeId) {
+    public LikeResponse getLikeById(@PathVariable(value = "likeId") Long likeId) {
         return likeService.getLikeById(likeId);
     }
 
