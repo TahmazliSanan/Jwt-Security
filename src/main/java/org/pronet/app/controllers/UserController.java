@@ -13,11 +13,6 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping(value = "/create")
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
-    }
-
     @GetMapping(value = "/list")
     public List<User> getUserList() {
         return userService.getUserList();
