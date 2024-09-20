@@ -68,6 +68,11 @@ public class LikeServiceImplementation implements LikeService {
     }
 
     @Override
+    public Boolean existsById(Long likeId) {
+        return likeRepository.existsById(likeId);
+    }
+
+    @Override
     public void deleteLike(Long likeId) {
         likeRepository.deleteById(likeId);
     }

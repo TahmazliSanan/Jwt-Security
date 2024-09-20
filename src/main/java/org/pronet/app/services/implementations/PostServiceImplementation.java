@@ -25,7 +25,7 @@ public class PostServiceImplementation implements PostService {
     private final LikeService likeService;
 
     @Override
-    public Post createPost(PostCreateRequest request) {
+    public PostResponse createPost(PostCreateRequest request) {
         User foundedUser = userRepository
                 .findById(request.getUserId())
                 .orElse(null);
@@ -35,7 +35,8 @@ public class PostServiceImplementation implements PostService {
             post.setTitle(request.getTitle());
             post.setText(request.getText());
             post.setUser(foundedUser);
-            return postRepository.save(post);
+            Post createdPost = postRepository.save(post);
+            return new PostResponse(createdPost);
         }
         return null;
     }
@@ -67,13 +68,14 @@ public class PostServiceImplementation implements PostService {
     }
 
     @Override
-    public Post updatePost(Long postId, PostUpdateRequest request) {
+    public PostResponse updatePost(Long postId, PostUpdateRequest request) {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isPresent()) {
             Post post = optionalPost.get();
             post.setTitle(request.getTitle());
             post.setText(request.getText());
-            return postRepository.save(post);
+            Post updatedPost = postRepository.save(post);
+            return new PostResponse(updatedPost);
         }
         return null;
     }
@@ -81,5 +83,10 @@ public class PostServiceImplementation implements PostService {
     @Override
     public void deletePost(Long postId) {
         postRepository.deleteById(postId);
+    }
+
+    @Override
+    public Boolean existsById(Long postId) {
+        return postRepository.existsById(postId);
     }
 }

@@ -11,5 +11,6 @@ public interface LikeService {
     Like createLike(LikeCreateRequest request);
     List<LikeResponse> getLikeList(Optional<Long> userId, Optional<Long> postId);
     LikeResponse getLikeById(Long likeId);
+    Boolean existsById(Long likeId);
     void deleteLike(Long likeId);
 }
