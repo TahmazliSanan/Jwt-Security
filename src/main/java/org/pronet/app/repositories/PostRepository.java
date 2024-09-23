@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByUserId(Long userId);
-    boolean existsById(Long postId);
 }
