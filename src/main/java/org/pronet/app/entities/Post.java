@@ -5,6 +5,8 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "posts")
 @Data
@@ -22,4 +24,7 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
 }
