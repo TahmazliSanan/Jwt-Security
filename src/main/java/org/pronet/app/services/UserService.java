@@ -1,17 +1,20 @@
 package org.pronet.app.services;
 
-import org.pronet.app.entities.User;
-import org.pronet.app.requests.user.RegisterRequest;
-import org.pronet.app.responses.AuthenticationResponse;
+import org.pronet.app.requests.authentication.RegisterRequest;
+import org.pronet.app.requests.user.UserUpdateRequest;
+import org.pronet.app.responses.UserActivityResponse;
+import org.pronet.app.responses.UserResponse;
 
 import java.util.List;
 
 public interface UserService {
-    AuthenticationResponse createUser(RegisterRequest request);
-    List<User> getUserList();
-    User getUserById(Long userId);
-    User getUserByUsername(String username);
+    UserResponse createUser(RegisterRequest request);
+    List<UserResponse> getUserList();
+    UserResponse getUserById(Long userId);
+    UserResponse getUserByUsername(String username);
+    Boolean existsUserById(Long userId);
     Boolean existsUserByUsername(String username);
-    User updateUser(Long userId, User user);
+    UserResponse updateUser(Long userId, UserUpdateRequest user);
     void deleteUser(Long userId);
+    UserActivityResponse getUserActivity(Long userId);
 }
