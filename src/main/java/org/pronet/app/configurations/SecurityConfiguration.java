@@ -50,8 +50,6 @@ public class SecurityConfiguration {
                         authorizeRequests
                                 .requestMatchers(AuthenticationRequestMatcher.NON_AUTH_ROUTES)
                                 .permitAll()
-                                .requestMatchers(AuthenticationRequestMatcher.USER_AUTH_ROUTES)
-                                .hasAuthority("User")
                                 .anyRequest()
                                 .authenticated()
                 );
