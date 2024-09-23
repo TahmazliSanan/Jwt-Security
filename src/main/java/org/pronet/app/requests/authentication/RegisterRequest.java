@@ -1,4 +1,4 @@
-package org.pronet.app.requests.user;
+package org.pronet.app.requests.authentication;
 
 import lombok.Data;
 
