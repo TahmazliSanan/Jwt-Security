@@ -9,11 +9,14 @@ import org.pronet.app.repositories.PostRepository;
 import org.pronet.app.repositories.UserRepository;
 import org.pronet.app.requests.comment.CommentCreateRequest;
 import org.pronet.app.requests.comment.CommentUpdateRequest;
+import org.pronet.app.responses.CommentResponse;
 import org.pronet.app.services.CommentService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -23,7 +26,7 @@ public class CommentServiceImplementation implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
-    public Comment createComment(CommentCreateRequest request) {
+    public CommentResponse createComment(CommentCreateRequest request) {
         User foundedUser = userRepository
                 .findById(request.getUserId())
                 .orElse(null);
@@ -36,37 +39,50 @@ public class CommentServiceImplementation implements CommentService {
             comment.setText(request.getText());
             comment.setUser(foundedUser);
             comment.setPost(foundedPost);
-            return commentRepository.save(comment);
+            comment.setCreatedDate(new Date());
+            Comment createdComment = commentRepository.save(comment);
+            return new CommentResponse(createdComment);
         }
         return null;
     }
 
     @Override
-    public List<Comment> getCommentList(Optional<Long> userId, Optional<Long> postId) {
+    public List<CommentResponse> getCommentList(Optional<Long> userId, Optional<Long> postId) {
+        List<Comment> commentList;
         if (userId.isPresent() && postId.isPresent()) {
-            return commentRepository.findAllByUserIdAndPostId(userId.get(), postId.get());
+            commentList = commentRepository.findAllByUserIdAndPostId(userId.get(), postId.get());
         } else if (userId.isPresent()) {
-            return commentRepository.findAllByUserId(userId.get());
+            commentList = commentRepository.findAllByUserId(userId.get());
         } else if (postId.isPresent()) {
-            return commentRepository.findAllByPostId(postId.get());
+            commentList = commentRepository.findAllByPostId(postId.get());
+        } else {
+            commentList = commentRepository.findAll();
         }
-        return commentRepository.findAll();
+        return commentList
+                .stream()
+                .map(CommentResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Comment getCommentById(Long commentId) {
-        return commentRepository
+    public CommentResponse getCommentById(Long commentId) {
+        Comment comment = commentRepository
                 .findById(commentId)
                 .orElse(null);
+        if (comment != null) {
+            return new CommentResponse(comment);
+        }
+        return null;
     }
 
     @Override
-    public Comment updateComment(Long commentId, CommentUpdateRequest request) {
+    public CommentResponse updateComment(Long commentId, CommentUpdateRequest request) {
         Optional<Comment> optionalComment = commentRepository.findById(commentId);
         if (optionalComment.isPresent()) {
             Comment comment = optionalComment.get();
             comment.setText(request.getText());
-            return commentRepository.save(comment);
+            Comment updatedComment = commentRepository.save(comment);
+            return new CommentResponse(updatedComment);
         }
         return null;
     }

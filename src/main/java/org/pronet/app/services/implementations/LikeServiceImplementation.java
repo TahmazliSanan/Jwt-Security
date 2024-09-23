@@ -53,7 +53,10 @@ public class LikeServiceImplementation implements LikeService {
         } else {
             likeList = likeRepository.findAll();
         }
-        return likeList.stream().map(LikeResponse::new).collect(Collectors.toList());
+        return likeList
+                .stream()
+                .map(LikeResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override

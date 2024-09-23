@@ -13,6 +13,7 @@ import org.pronet.app.services.LikeService;
 import org.pronet.app.services.PostService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class PostServiceImplementation implements PostService {
             post.setTitle(request.getTitle());
             post.setText(request.getText());
             post.setUser(foundedUser);
+            post.setCreatedDate(new Date());
             Post createdPost = postRepository.save(post);
             return new PostResponse(createdPost);
         }
