@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.pronet.app.entities.User;
 import org.pronet.app.repositories.UserRepository;
 import org.pronet.app.requests.user.RegisterRequest;
+import org.pronet.app.responses.AuthenticationResponse;
 import org.pronet.app.services.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,13 @@ public class UserServiceImplementation implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void createUser(RegisterRequest request) {
+    public AuthenticationResponse createUser(RegisterRequest request) {
         User user = new User();
         user.setId(request.getId());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(user);
+        User createdUser = userRepository.save(user);
+        return new AuthenticationResponse("User is created successfully!", createdUser);
     }
 
     @Override
@@ -36,6 +38,11 @@ public class UserServiceImplementation implements UserService {
         return userRepository
                 .findById(userId)
                 .orElse(null);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsernameContainingIgnoreCase(username);
     }
 
     @Override
