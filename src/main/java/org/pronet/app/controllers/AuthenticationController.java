@@ -1,8 +1,10 @@
 package org.pronet.app.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.pronet.app.entities.User;
 import org.pronet.app.requests.user.LoginRequest;
 import org.pronet.app.requests.user.RegisterRequest;
+import org.pronet.app.responses.AuthenticationResponse;
 import org.pronet.app.security.JwtTokenProvider;
 import org.pronet.app.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -25,20 +27,26 @@ public class AuthenticationController {
     private final UserService userService;
 
     @PostMapping(value = "/login")
-    public String login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "Bearer " + jwtTokenProvider.generateToken(authentication);
+        User foundedUser = userService.getUserByUsername(request.getUsername());
+        String token = "Bearer " + jwtTokenProvider.generateToken(authentication);
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse(token, foundedUser);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+        AuthenticationResponse authenticationResponse;
         Boolean existUserByUsername = userService.existsUserByUsername(request.getUsername());
         if (existUserByUsername) {
-            return new ResponseEntity<>("User is already exist!", HttpStatus.BAD_REQUEST);
+            User foundedUser = userService.getUserById(request.getId());
+            authenticationResponse = new AuthenticationResponse("User is already exist!", foundedUser);
+            return new ResponseEntity<>(authenticationResponse, HttpStatus.BAD_REQUEST);
         }
-        userService.createUser(request);
-        return new ResponseEntity<>("User is registered successfully!", HttpStatus.CREATED);
+        authenticationResponse = userService.createUser(request);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.CREATED);
     }
 }
