@@ -32,6 +32,7 @@ public class Comment {
     @JsonIgnore
     private Post post;
 
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 }

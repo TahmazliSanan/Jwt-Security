@@ -25,6 +25,7 @@ public class Post {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 }
